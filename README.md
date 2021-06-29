@@ -1,6 +1,6 @@
 # TPC-C Benchmark
 
-## Goals ([Project statement](https://github.com/13caroline/tpc-c-benchmark/blob/main/abd.pdf))
+## Goals ([Project assignment](https://github.com/13caroline/tpc-c-benchmark/blob/main/abd.pdf))
 Configuration, optimization and evaluation of the TPC-C benchmark with some additional data and queries. TPC-C simulates a database system of a chain of stores, supporting the daily operation of sales and stock management. 
 Additional analytical questions, based on the adaptation of the TPC-H, they may be run occasionally. ([Technical report](https://github.com/13caroline/tpc-c-benchmark/blob/main/ABD_relat%C3%B3rio.pdf))
 
