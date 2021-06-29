@@ -1,0 +1,97 @@
+fsync                       TX/s			        response time(s)	        abort rate
+on                          427.3994715137041      0.009564871821403627        0.011001100110011002
+off                         431.0244042985253      0.004245007487964624        0.004236935581938622
+
+
+synchronous_commit  
+off                         429.42859831396913     0.0045159188461092285       0.004139736982292195
+local                       425.6115219241525      0.009553479373076577        0.011202629568522216
+remote_write                426.9074537744658      0.009210869095797665        0.01064042396300661
+remote_apply                424.5209671638499      0.010097702269155337        0.01150414072029274
+on                          425.70607866903543     0.009906548617340772        0.01129242693986156
+
+wal_sync_method
+open_datasync               424.743140737298       0.009783765476725482        0.011186676455813595
+fdatasync                   341.5355461856518      0.012857020010169591        0.01739175159259069
+fsync                       421.8047731456655      0.01424283411316007         0.01644859813084112
+fsync_writethrough    ->    (tentei testar mas o postgres diz que este parametro nao está disponivel, logo é para retirar)
+open_sync                   423.1859583068021      0.015854408310927062        0.01856179775280899
+
+
+full_page_writes
+on                          424.4317320283962      0.009101486177509875        0.010394101652642878  
+off                         426.06223554301835     0.00616516448559458         0.007259539779838891
+
+
+wal_buffers
+2MB                         347.3277132448769      0.012535213570406704        0.01588897827835881
+8MB                         426.3333029068369      0.009705834647150802        0.01132799219997819
+16MB                        426.578784325006       0.009826457105435497        0.012175906948145111
+32MB                        375.79469128264066     0.015142054958183994        0.02256926873700846
+
+commit_delay
+200 microseconds            423.61231477403504     0.01061983848031982         0.012237379994832076           
+350 microseconds            424.18847791826397     0.01000802920182967         0.012135469895935775
+500 microseconds            378.7530645383823      0.012702309648403841        0.016832767419916937
+
+commit_siblings
+5                           427.60162860056977     0.009130000840341566        0.010496354100038378                                                                             
+7                           415.20622429500844     0.009661378852765549        0.011729875084447153
+10                          424.08556670781877     0.009685025390650498        0.011433880937939579
+15                          336.85681655811135     0.014042107870456375        0.019586713514908212
+
+wal_writer_delay
+300                         427.26564571731626     0.009025465971023487        0.010402871346039424
+500                         426.74570896808433     0.008274155198035798        0.009719174094146101
+1000                        426.44932844257823     0.009268244780492233        0.010829283305335778
+
+wal_writer_flush_after
+2MB                         423.75948644242186     0.009206687108177257        0.010633775602215638
+4MB                         426.07779320213547     0.008984905178235714        0.011073907275205097
+8MB                         426.4137562297248      0.009431033698667516        0.010682263714368352
+12MB                        425.76421021264605     0.008604026932623082        0.010020978617207599
+16MB                        424.820303805997       0.008679370011180158        0.010267627380339681
+
+
+Best Settings                                               TX/s			        response time(s)	        abort rate
+
+fsync = on   (off não é seguro)                             430.7522571595688       0.004288982560010298        0.004382536489101324
+synchronous_commit = off
+wal_sync_method = open_datasync
+full_page_writes = on (off não é seguro)
+wal_buffers = 8MB
+commit_delay = 350
+commit_siblings = 5
+wal_writer_delay = 500
+wal_writer_flush_after = 8MB
+
+
+Best CheckPoint                                             TX/s			        response time(s)	        abort rate
+max_wal_size = 2000MB                                       429.16108014670846      0.006360503995559057        0.007406553133689565
+min_wal_size  = 80MB
+Checkpoint timeout defult = 5 min
+checkpoint_warning = 20s
+checkpoint_completion_target = 0.25
+
+
+Best Archive                                                TX/s			        response time(s)	        abort rate
+archive_mode = off                                          426.1018184629486      0.008053653700355748        0.009632662491015504         -> na melhor configuraçao usar estes valores default
+archive_timeout = 0 (disabled)
+
+
+
+Best Total                                                  TX/s			        response time(s)	        abort rate
+fsync = on   (off não é seguro)                             429.860564100438        0.0032212499196296535       0.003262005011567621
+synchronous_commit = off
+wal_sync_method = open_datasync
+full_page_writes = on (off não é seguro)
+wal_buffers = 8MB
+commit_delay = 350
+commit_siblings = 5
+wal_writer_delay = 500
+wal_writer_flush_after = 8MB
+max_wal_size = 2000MB                                       
+min_wal_size  = 80MB
+Checkpoint timeout defult = 5 min
+checkpoint_warning = 20s
+checkpoint_completion_target = 0.25

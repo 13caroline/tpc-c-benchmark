@@ -1,0 +1,257 @@
+Query 1:
+Mudar:	"orderline"	->	"order_line"
+Planning time: 0.880ms
+Execuion time: 219.182ms
+Resultado: 13 rows
+
+
+
+Query 2:
+Mudar:	"Europ%"	->	"EUROP%" (2 sitios)
+	"%b"		->	"1%"
+Planning time: 0.946ms
+Execution time: 5666.177ms
+Resultado: 18316 rows (se retirar a condição "and i_data like '1%' -> 36187)
+
+
+
+Query 3:
+Mudar:	"neworder"	->	"new_order"
+	"orderline"	->	"order_line"
+	"like 'A%'"	->	"like 'a%'"
+Planning time: 1.691ms
+Execution time: 51.592ms
+Resultado: 268 rows
+
+
+
+Query 4:
+Mudar:	"orderline"	->	"order_line"
+Planning time: 0.695ms
+Execution time: 7.284ms
+Resultado: 0 rows ( se tirar "and o_entry_d < '2012-01-02 00:00:00.000000'" -> resultado = 12 rows)
+
+
+
+Query 5:
+Mudar:	"orderline"	->	"order_line"
+	"Europe"	->	"EUROPE"
+	"and ascii(substr(c_state,1,1)) = su_nationkey" -> remover
+Planning time: 3.115ms
+Execution time: 923.482ms
+Resultado: 5 rows
+
+
+
+Query 6:
+Mudar:	"oderline"	->	"order_line"
+	alterar datas
+Planning time: 0.104ms
+Execution time: 155.708ms
+Resultado: 1 row (é o suposto visto que a query é um sum())
+
+
+
+Query 7:
+select  su_nationkey as supp_nation,
+  substr(c_state,1,1) as cust_nation,
+  extract(year from o_entry_d) as l_year,
+  sum(ol_amount) as revenue
+  from  supplier, stock, order_line, orders, customer, nation n1, nation n2
+  where  ol_supply_w_id = s_w_id
+  and ol_i_id = s_i_id
+  and mod((s_w_id * s_i_id), 10000) = su_suppkey
+  and ol_w_id = o_w_id
+  and ol_d_id = o_d_id
+  and ol_o_id = o_id
+  and c_id = o_c_id
+  and c_w_id = o_w_id
+  and c_d_id = o_d_id
+  and su_nationkey = n1.n_nationkey
+  and (                                          
+  (n1.n_name = 'GERMANY')
+      or                 
+  (n2.n_name = 'GERMANY')
+      )                  
+  and ol_delivery_d >= '2007-01-02 00:00:00.000000'
+group by su_nationkey, substr(c_state,1,1), extract(year from o_entry_d)
+order by su_nationkey, cust_nation, l_year;
+
+Mudar: 	n_name		-> maiúscula;
+	ol_delivery_d	-> intervalo das datas
+	remover 	-> "and ascii(substr(c_state,1,1)) = n2.n_nationkey"
+Planning time: 2.131ms
+Execution time: 2219.991ms
+Resultado: 875 rows
+ JIT:
+   Functions: 210
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 38.867 ms, Inlining 0.000 ms, Optimization 12.201 ms, Emission 286.881 ms, Total 337.949 ms
+
+
+
+Query 8:
+select  extract(year from o_entry_d) as l_year,
+  sum(case when n2.n_name = 'GERMANY' then ol_amount else 0 end) / sum(ol_amount) as mkt_share
+from  item, supplier, stock, order_line, orders, customer, nation n1, nation n2, region
+where  i_id = s_i_id
+  and ol_i_id = s_i_id
+  and ol_supply_w_id = s_w_id
+  and mod((s_w_id * s_i_id),10000) = su_suppkey
+  and ol_w_id = o_w_id
+  and ol_d_id = o_d_id
+  and ol_o_id = o_id
+  and c_id = o_c_id
+  and c_w_id = o_w_id
+  and c_d_id = o_d_id
+  and n1.n_regionkey = r_regionkey               
+  and ol_i_id < 1000
+  and r_name = 'EUROPE'
+  and su_nationkey = n2.n_nationkey
+  and o_entry_d >= '2007-01-02 00:00:00.000000'
+  and i_data like '1%'
+  and i_id = ol_i_id
+group by extract(year from o_entry_d)
+order by l_year;
+
+Mudar:	"orderline"	  ->	"order_line"
+	"n_name"/"r_name" ->	maiúscula
+	remover		  ->	"and n1.n_nationkey = ascii(substr(c_state,1,1))"
+	"i_data like '%b'"->	"i_data like '1%'
+Planning time: 6.893ms
+Execution time: 128.003ms
+Resultado: 1 row
+
+
+
+Query 9:
+Mudar:	"orderline"		->	"order_line"
+	"and i_data like '%BB'" ->	"and i_data like '1%'"
+Planning time: 1.529ms
+Execution time: 976.353ms
+Resultado: 50 rows
+
+
+
+Query 10:
+Mudar:	"orderline"	->	"order_line"
+	remover		->	"and o_entry_d <= ol_delivery_d
+	 			 and n_nationkey = ascii(substr(c_state,1,1))" (talvez deixar esta linha se o benchmark correr mais que 10 min e houver resultados para esta query)
+Planning time: 1.166ms
+Execution time: 53472.663ms
+Resultado: 1500000 rows (não é engano)
+
+
+
+Query 11:
+Mudar:	"n_name"	->	"maiúscula" (2 sitios)
+Planning time: 0.361ms
+Execution time: 194.034ms
+Resultado: 126 rows
+
+
+
+Query 12:
+Mudar:	"orderline"	->	"order_line"
+	remover		->	"and ol_delivery_d < '2020-01-01 00:00:00.000000'"
+Planning time: 0.350ms
+Execution time: 496.228ms
+Resultado: 10 rows
+
+
+
+Query 13:
+Planning time: 0.343ms
+Execution time: 59.779ms
+Resultado: 11 rows
+
+
+
+Query 14:
+Mudar:	"orderline"	->	"order_line"
+	remover		->	"and ol_delivery_d < '2020-01-02 00:00:00.000000'"
+Planning time: 0.296ms
+Execution time: 71.483ms
+Resultado: 1 row
+
+
+
+Query 15:
+Mudar:	"orderline"	->	"order_line"
+Planning time: 0.708ms
+Execution time: 708.735ms
+Resultado: 1 row
+
+
+
+Query 16:
+Planning time: 0.404ms
+Execution time: 971.397ms
+Resultado: 99961 rows
+
+
+
+Query 17:
+Mudar:	"orderline"	->	"order_line" (2 sítios)
+Planning time: 1.626ms
+Execution time: 25.954ms
+Resultado: 1 rows
+
+
+
+Query 18:
+mudar	"orderline"	->	"order_line"
+Planning Time: 2.248 ms
+Execution Time: 3580.144 ms
+Resultado: 18000 rows
+(explain analyze mostrou isto tambem:
+ JIT:
+   Functions: 106
+   Options: Inlining false, Optimization false, Expressions true, Deforming true
+   Timing: Generation 17.781 ms, Inlining 0.000 ms, Optimization 177.738 ms, Emission 1094.004 ms, Total 1289.522 ms
+)
+
+
+
+Query 19:
+Mudar:	"orderline"		->	"order_line"
+	"i_data like '%a'"	->	"i_data like '1%'" (3 sitios - '2%' e '3%')
+Planning time: 0.967ms
+Execution time: 72.410ms
+Resultado: 1 rows
+
+
+
+Query 20:
+Mudar:	"orderline"	->	"order_line"
+	"n_name"	->	maiúscula
+Planning time: 0.728ms
+Execution time: 17.882ms
+Resultado: 3 rows
+
+
+
+Query 21:
+Mudar:	"orderline"	->	"order_line" (2 sitios)
+	"n_name"	->	maiúscula
+Planning time: 1.836ms
+Execution time: 318.307ms
+Resultado: 396 rows
+
+
+
+Query 22:
+select  substr(c_state,1,1) as country,
+  count(*) as numcust,
+  sum(c_balance) as totacctbal
+  from  customer
+  where  substr(c_phone,1,1) in ('1','2','3','4','5','6','7')
+  and c_balance > (select avg(c_BALANCE)
+     from  customer)
+group by substr(c_state,1,1)
+order by substr(c_state,1,1);
+
+Planning time: 0.242ms
+Execution time: 57.307ms
+Resultado: 13 rows
+
